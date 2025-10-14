@@ -12,11 +12,16 @@ public final class CareHomeState implements Serializable {
     public final WardRepository wards;
     public final RosterRepository roster;
     public final AuditRepository audit;
+    public final PrescriptionRepository prescriptions;       // NEW
+    public final AdministrationRepository administrations;   // NEW
 
     public CareHomeState(ResidentRepository residents, StaffRepository staff,
                          BedRepository beds, WardRepository wards,
-                         RosterRepository roster, AuditRepository audit) {
+                         RosterRepository roster, AuditRepository audit,
+                         PrescriptionRepository prescriptions,
+                         AdministrationRepository administrations) {
         this.residents = residents; this.staff = staff; this.beds = beds;
         this.wards = wards; this.roster = roster; this.audit = audit;
+        this.prescriptions = prescriptions; this.administrations = administrations;
     }
 }

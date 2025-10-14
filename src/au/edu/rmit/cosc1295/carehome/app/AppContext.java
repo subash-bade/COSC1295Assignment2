@@ -18,7 +18,9 @@ public final class AppContext {
             new BedRepository(),
             new WardRepository(),
             new RosterRepository(),
-            new AuditRepository()
+            new AuditRepository(),
+            new PrescriptionRepository(),       // NEW
+            new AdministrationRepository()      // NEW
         ));
         INSTANCE = ctx;
         return ctx;
