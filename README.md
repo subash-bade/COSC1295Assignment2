@@ -20,6 +20,9 @@
 1. Open in Eclipse → run `au.edu.rmit.cosc1295.carehome.app.Main`
 2. Use CLI commands below.
 
+## GitHub Repo
+https://github.com/subash-bade/COSC1295Assignment2.git
+
 ## CLI Commands
 help
 exit
