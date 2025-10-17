@@ -12,6 +12,9 @@ import au.edu.rmit.cosc1295.carehome.exceptions.*;
 import au.edu.rmit.cosc1295.carehome.model.*;
 import au.edu.rmit.cosc1295.carehome.repo.AuditRepository;
 import au.edu.rmit.cosc1295.carehome.util.Ids;
+import au.edu.rmit.cosc1295.carehome.app.StateSerializer;
+
+
 
 public final class CliApp {
 
@@ -53,6 +56,8 @@ public final class CliApp {
                         case "listorders" -> cmdListOrders(args);
                         case "admin" -> cmdAdmin(args);
                         case "audit" -> listAudit();
+                        case "compliance" -> cmdCompliance();
+                        case "save" -> cmdSave();
                         default -> System.out.println("Unknown command. Type 'help'.");
                     }
                 } catch (Exception e) {
@@ -86,8 +91,11 @@ public final class CliApp {
               listorders <residentId>     # list resident prescriptions & orders
               admin <nurseId> <residentId> <medOrderId> <doseGiven> [notes...] [DAY HH:mm]
         	   # Records an administration. If DAY HH:mm provided, uses that moment for roster check; otherwise uses now.
-              
+            
               audit                           # show audit log
+              
+              compliance                      # run roster compliance checks
+        	  save                            # save state immediately
             """);
     }
 
@@ -304,6 +312,27 @@ public final class CliApp {
         }
         for (AuditRepository.Entry e : entries) {
             System.out.println(e.ts + " | staff=" + e.staffId + " | " + e.action + " | " + e.details);
+        }
+    }
+    
+    // ---------- Compliance check ----------
+    private void cmdCompliance() {
+        try {
+            svc.careHome.checkCompliance();
+            System.out.println("✅ Compliance OK: nurse shift windows and daily limits satisfied; doctor coverage present every day.");
+        } catch (Exception e) {
+            System.out.println("❌ Compliance violation: " + (e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage()));
+        }
+    }
+
+    // ---------- Save State ----------
+    private void cmdSave() {
+        try {
+            var ctx = AppContext.get();
+            StateSerializer.save(ctx.state, ctx.saveFile);
+            System.out.println("State saved to " + ctx.saveFile);
+        } catch (Exception e) {
+            System.out.println("ERROR saving: " + e.getMessage());
         }
     }
 }

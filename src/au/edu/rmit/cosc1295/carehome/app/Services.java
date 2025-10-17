@@ -3,7 +3,7 @@ package au.edu.rmit.cosc1295.carehome.app;
 import java.time.ZoneId;
 
 import au.edu.rmit.cosc1295.carehome.repo.*;
-import au.edu.rmit.cosc1295.carehome.service.*;
+import au.edu.rmit.cosc1295.carehome.service.*;  
 
 public final class Services {
     public final AuditService audit;
@@ -12,6 +12,7 @@ public final class Services {
     public final BedService beds;
     public final PrescriptionService prescriptions;
     public final MedicationService medications;
+    public final CareHome careHome;                     
 
     public Services(CareHomeState state) {
         AuditRepository auditRepo = state.audit;
@@ -28,5 +29,6 @@ public final class Services {
         this.beds = new BedService(residentRepo, bedRepo);
         this.prescriptions = new PrescriptionService(residentRepo, rxRepo, auth);
         this.medications = new MedicationService(residentRepo, rxRepo, adminRepo, auth);
+        this.careHome = new CareHome(staffRepo, rosterRepo);  
     }
 }
