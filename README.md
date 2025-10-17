@@ -52,6 +52,11 @@ Records an administration at the specified moment (or now).
 audit # show audit log
 compliance # run roster compliance checks
 
+discharge <residentId>          # Discharge resident and export snapshot to /archive/<residentId>-<timestamp>/
+
+openarchive <residentId>        # prints path of most recent snapshot for that resident
+
+
 ## Typical Demo flow
 seed
 makedoctor D1 DrDee drd
@@ -71,3 +76,14 @@ audit
 compliance
 save
 exit
+
+## Project layout
+- `au.edu.rmit.cosc1295.carehome.model` — domain entities
+- `au.edu.rmit.cosc1295.carehome.repo` — in-memory repositories (Serializable)
+- `au.edu.rmit.cosc1295.carehome.service` — business logic, auth, auditing, compliance
+- `au.edu.rmit.cosc1295.carehome.app` — `Main`, state, serializer, services registry
+- `au.edu.rmit.cosc1295.carehome.ui` — CLI
+
+## Notes
+- If you see a NullPointerException on startup after pulling new code, delete `data/carehome-state.bin` (old schema) or rely on the built-in migration in `AppContext`.
+- JUnit 5 is configured via module path: `requires org.junit.jupiter.api;` in `module-info.java`.

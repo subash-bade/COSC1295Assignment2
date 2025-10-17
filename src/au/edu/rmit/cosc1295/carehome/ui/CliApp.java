@@ -1,5 +1,6 @@
 package au.edu.rmit.cosc1295.carehome.ui;
 
+import java.nio.file.Path;
 import java.time.*;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +14,9 @@ import au.edu.rmit.cosc1295.carehome.model.*;
 import au.edu.rmit.cosc1295.carehome.repo.AuditRepository;
 import au.edu.rmit.cosc1295.carehome.util.Ids;
 import au.edu.rmit.cosc1295.carehome.app.StateSerializer;
+import au.edu.rmit.cosc1295.carehome.archive.ArchiveService;
+
+
 
 
 
@@ -58,6 +62,10 @@ public final class CliApp {
                         case "audit" -> listAudit();
                         case "compliance" -> cmdCompliance();
                         case "save" -> cmdSave();
+                        case "discharge" -> cmdDischarge(args);
+                        case "openarchive" -> cmdOpenArchive(args);
+
+
                         default -> System.out.println("Unknown command. Type 'help'.");
                     }
                 } catch (Exception e) {
@@ -96,6 +104,11 @@ public final class CliApp {
               
               compliance                      # run roster compliance checks
         	  save                            # save state immediately
+        	  
+        	  discharge <residentId>          # set status=DISCHARGED, vacate bed, write snapshot bundle
+              openarchive <residentId>        # prints last snapshot path for that resident (if any)
+              
+
             """);
     }
 
@@ -334,5 +347,28 @@ public final class CliApp {
         } catch (Exception e) {
             System.out.println("ERROR saving: " + e.getMessage());
         }
+    }
+    
+ // ---------- Discharge Resident ----------
+    private void cmdDischarge(List<String> a) throws Exception {
+        if (a.size() < 1) { System.out.println("Usage: discharge <residentId>"); return; }
+        var residentId = a.get(0);
+
+        // perform archive under audit wrapper
+        Path out = svc.audit.audited("system", "DISCHARGE",
+                () -> "resident=" + residentId,
+                () -> {
+                    var arch = new ArchiveService(AppContext.get().state);
+                    return arch.dischargeAndArchive(residentId);
+                });
+
+        System.out.println("Resident discharged. Snapshot written to: " + out);
+    }
+    
+    private void cmdOpenArchive(List<String> a) {
+        if (a.size() < 1) { System.out.println("Usage: openarchive <residentId>"); return; }
+        var residentId = a.get(0);
+        var path = ArchiveService.latestSnapshotPathOrNone(residentId);
+        System.out.println("Latest snapshot: " + path);
     }
 }
